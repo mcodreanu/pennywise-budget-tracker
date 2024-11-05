@@ -53,10 +53,15 @@ const getDateAdjustedForTimezone = (dateInput: Date | string): Date => {
   if (typeof dateInput === "string") {
     // Split the date string to get year, month, and day parts
     const parts = dateInput.split("-").map((part) => parseInt(part, 10));
-    // Create a new Date object using the local timezone
-    // Note: Month is 0-indexed, so subtract 1 from the month part
-    const date = new Date(parts[0], parts[1] - 1, parts[2]);
-    return date;
+
+    // Check that each part is a valid number before creating a Date object
+    if (parts[0] && parts[1] && parts[2]) {
+      // Create a new Date object using the local timezone
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);
+      return date;
+    } else {
+      throw new Error("Invalid date format. Expected format: YYYY-MM-DD");
+    }
   } else {
     // If dateInput is already a Date object, return it directly
     return dateInput;
