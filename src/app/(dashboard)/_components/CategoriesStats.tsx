@@ -1,13 +1,13 @@
 "use client";
 
-import type { GetCategoriesStatsResponseType } from "@/app/api/stats/categories/route";
+import { GetCategoriesStatsResponseType } from "@/app/api/stats/categories/route";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DateToUTCDate, GetFormatterForCurrency } from "@/lib/helpers";
-import type { TransactionType } from "@/lib/types";
-import type { UserSettings } from "@prisma/client";
+import { TransactionType } from "@/lib/types";
+import { UserSettings } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -22,7 +22,7 @@ function CategoriesStats({ userSettings, from, to }: Props) {
     queryKey: ["overview", "stats", "categories", from, to],
     queryFn: () =>
       fetch(
-        `/api/stats/categories?from=${DateToUTCDate(from).toISOString()}&to=${DateToUTCDate(to).toISOString()}`,
+        `/api/stats/categories?from=${DateToUTCDate(from)}&to=${DateToUTCDate(to)}`,
       ).then((res) => res.json()),
   });
 
@@ -36,14 +36,14 @@ function CategoriesStats({ userSettings, from, to }: Props) {
         <CategoriesCard
           formatter={formatter}
           type="income"
-          data={statsQuery.data ?? []}
+          data={statsQuery.data || []}
         />
       </SkeletonWrapper>
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
         <CategoriesCard
           formatter={formatter}
           type="expense"
-          data={statsQuery.data ?? []}
+          data={statsQuery.data || []}
         />
       </SkeletonWrapper>
     </div>
@@ -63,7 +63,7 @@ function CategoriesCard({
 }) {
   const filteredData = data.filter((el) => el.type === type);
   const total = filteredData.reduce(
-    (acc, el) => acc + (el._sum?.amount ?? 0),
+    (acc, el) => acc + (el._sum?.amount || 0),
     0,
   );
 
@@ -88,7 +88,7 @@ function CategoriesCard({
           <ScrollArea className="h-60 w-full px-4">
             <div className="flex w-full flex-col gap-4 p-4">
               {filteredData.map((item) => {
-                const amount = item._sum.amount ?? 0;
+                const amount = item._sum.amount || 0;
                 const percentage = (amount * 100) / (total || amount);
 
                 return (
